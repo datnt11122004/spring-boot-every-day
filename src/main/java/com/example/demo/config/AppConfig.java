@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 public class AppConfig {
 
     private final Dotenv dotenv = Dotenv.load();
+    private static final Logger LOGGER = Logger.getLogger(AppConfig.class.getName());
 
     // Environment variables
 
@@ -30,9 +31,9 @@ public class AppConfig {
     private String APP_BASE_URL;
 
     //JWT Token Configurations
-    private String JWT_SECRET_KEY;
-    private String JWT_EXPIRATION;
-    private String JWT_EXPIRATION_REFRESH_TOKEN;
+    private String APP_JWT_SECRET_KEY;
+    private String APP_JWT_EXPIRATION;
+    private String APP_JWT_EXPIRATION_REFRESH_TOKEN;
 
     // Email Configurations
     private String APP_MAIL_HOST;
@@ -55,32 +56,50 @@ public class AppConfig {
     private String APP_KAFKA_SERVER;
     private String APP_KAFKA_BROKER_PORT;
 
-    // Logger Configurations
-    private String APP_LOG_LEVEL;
-    private String APP_LOG_FILE_PATH;
-    private String APP_LOG_FILE_NAME;
-    private String APP_LOG_FILE_MAX_SIZE;
-    private String APP_LOG_FILE_MAX_HISTORY;
-    private String APP_LOG_FILE_MAX_AGE;
-    private String APP_LOG_CONSOLE_ENABLE;
-    private String APP_LOG_CONSOLE_LEVEL;
-
     @PostConstruct
     public void init() {
-        for (Field field : this.getClass().getDeclaredFields()) {
+        dotenv.entries().forEach(entry -> {
+            System.setProperty(entry.getKey(), entry.getValue());
+        });
+
+        APP_JWT_EXPIRATION = dotenv.get("APP_JWT_EXPIRATION");
+        APP_JWT_EXPIRATION_REFRESH_TOKEN = dotenv.get("APP_JWT_EXPIRATION_REFRESH_TOKEN");
+
+        validateEnvVariables();
+    }
+
+    private void validateEnvVariables() {
+        Field[] fields = this.getClass().getDeclaredFields();
+        for (Field field : fields) {
             if (field.getType().equals(String.class)) {
                 try {
-                    String value = getDotenv().get(field.getName());
+                    field.setAccessible(true);
+                    LOGGER.info("Validating " + field.getName() + field.get(this));
+                    String value = (String) field.get(this);
                     if (value == null || value.isEmpty()) {
-                        Logger.getLogger(AppConfig.class.getName()).severe(field.getName() + " must not be null or empty");
-                        throw new IllegalArgumentException(field.getName() + " must not be null or empty");
+                        LOGGER.severe(field.getName() + " is not set");
+                        throw new IllegalStateException(field.getName() + " is not set");
                     }
-                    field.set(this, value);
                 } catch (IllegalAccessException e) {
+                    LOGGER.severe("Unable to access field: " + field.getName());
                     throw new RuntimeException(e);
                 }
             }
         }
-    }
 
+        // Validate JWT_EXPIRATION and APP_JWT_EXPIRATION_REFRESH_TOKEN as numbers
+        try {
+            Integer.parseInt(APP_JWT_EXPIRATION);
+        } catch (NumberFormatException e) {
+            LOGGER.severe("JWT_EXPIRATION is not a valid number");
+            throw new IllegalStateException("JWT_EXPIRATION is not a valid number");
+        }
+
+        try {
+            Integer.parseInt(APP_JWT_EXPIRATION_REFRESH_TOKEN);
+        } catch (NumberFormatException e) {
+            LOGGER.severe("APP_JWT_EXPIRATION_REFRESH_TOKEN is not a valid number");
+            throw new IllegalStateException("APP_JWT_EXPIRATION_REFRESH_TOKEN is not a valid number");
+        }
+    }
 }

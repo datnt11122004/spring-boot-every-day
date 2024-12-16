@@ -1,0 +1,22 @@
+{
+  "name": "schema-migration",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:migrate-create": "prisma migrate dev --name init --create-only",
+    "prisma:deploy": "prisma migrate deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "prisma": "^6.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
