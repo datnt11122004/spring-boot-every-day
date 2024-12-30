@@ -1,12 +1,12 @@
 package com.example.demo.repositories;
 
-import com.example.demo.models.BaseModel;
 import com.example.demo.repositories.abstracts.BaseRepositoryAbstract;
 import com.example.demo.repositories.interfaces.BaseRepositoryInterface;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Transactional
 public class BaseRepository<BaseModel extends com.example.demo.models.BaseModel, UUID> extends BaseRepositoryAbstract<BaseModel, UUID> implements BaseRepositoryInterface<BaseModel, UUID> {
