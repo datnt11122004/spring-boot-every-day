@@ -21,6 +21,9 @@ public class JWTToken {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
+    @Value("${jwt.expiration-refresh-token}")
+    private long jwtRefreshExpiration;
+
     private Key key;
 
     @PostConstruct
@@ -49,15 +52,19 @@ public class JWTToken {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username) {
-        return createToken(username);
+    public String generateAccessToken(String username) {
+        return createToken(username, jwtExpiration);
     }
 
-    private String createToken(String subject) {
+    public String generateRefreshToken(String username) {
+        return createToken(username, jwtRefreshExpiration);
+    }
+
+    private String createToken(String subject, long expirationTime) {
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

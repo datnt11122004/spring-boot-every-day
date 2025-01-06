@@ -13,7 +13,7 @@ npm install
 ```
 
 3. Generate Migration
-    1. Change the schema in `schema.prisma`
+    ##### Step 1. Change the schema in `schema.prisma`
     Example:
     ```
     model User {
@@ -26,10 +26,10 @@ npm install
         @@map("users")
     }
    ```
-   
-   2. Create Migration
+
+   ##### Step 2. Create Migration
     ```bash
      npm run prisma:migrate-create
     ```
-   
-    3. Copy Migration applied to flyway
+
+   ##### Step 3. Copy Migration applied to flyway

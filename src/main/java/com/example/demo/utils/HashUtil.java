@@ -2,6 +2,7 @@ package com.example.demo.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.istack.NotNull;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -13,6 +14,7 @@ public class HashUtil {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    @NotNull
     public static String generateHmacSHA256(String secretKey, Object data) {
         try {
             String dataString = objectMapper.writeValueAsString(data);
